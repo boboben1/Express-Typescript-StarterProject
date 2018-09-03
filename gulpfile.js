@@ -6,14 +6,20 @@ var tsProject = ts.createProject('tsconfig.json');
 var babel = require('gulp-babel');
 var sourcemaps = require('gulp-sourcemaps');
 var merge = require('merge-stream');
+var plumber = require('gulp-plumber');
 
 gulp.task('default', function() {
     var tsResult = tsProject.src()
+		.pipe(plumber())
 		.pipe(sourcemaps.init())
-        .pipe(tsProject())
+        	.pipe(tsProject());
 	var babelResult = tsResult.js
-		.pipe(babel({presets: ['@babel/preset-env']}));
-		//.pipe(sourcemaps.write('./'));
+		.pipe(plumber())
+		.pipe(babel({
+			presets: ['@babel/env']
+		}))
+		.pipe(sourcemaps.write('./'));
 	return merge(tsResult.dts, babelResult)
+	.pipe(plumber())
         .pipe(gulp.dest('./dist'));
 });

@@ -4,8 +4,9 @@
             "targets": {
                 "node": true
             },
-            "useBuiltIns": true,
-			"modules": true
+            "useBuiltIns": "entry",
+            "modules": false,
+            "debug": true
         }]
     ]
 }

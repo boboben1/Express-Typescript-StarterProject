@@ -27,8 +27,6 @@ export default class App extends AppConfig {
         for (const K in options) {
             this[K] = options[K];
         }
-
-        this.initialize();
     }
 
     initialize() {
@@ -39,6 +37,7 @@ export default class App extends AppConfig {
         this.initializeMiddleware();
         this.initializeCors();
         this.initializeRoutes();
+        this.initializeServer();
     }
 
     initializeMiddleware() {
@@ -69,6 +68,7 @@ export default class App extends AppConfig {
     initializeServer() {
         this.server = this.createServer();
         this.server.listen(this.port);
+
         this.server.on('error', this.onError);
         this.server.on('listening', this.onListening);
     }
@@ -82,7 +82,7 @@ export default class App extends AppConfig {
         return http.createServer(this.app);
     }
 
-    onError(error: any) {
+    onError = (error: any) => {
         if (error.syscall !== 'listen') {
             throw error;
         }
@@ -106,7 +106,7 @@ export default class App extends AppConfig {
         }
     }
 
-    onListening() {
+    onListening = () => {
         const addr = this.server.address();
         const bind = typeof addr === 'string'
             ? 'pipe ' + addr
