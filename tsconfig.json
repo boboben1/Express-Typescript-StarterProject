@@ -1,0 +1,25 @@
+{
+  "compileOnSave": false,
+  "exclude": [
+    "dist",
+    "node_modules",
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": "src",
+    "sourceMap": false,
+    "noImplicitAny": false,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es2018",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2016",
+      "dom"
+    ]
+  }
+}
