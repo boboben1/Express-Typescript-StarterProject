@@ -21,7 +21,7 @@ rm -rf Express-Typescript-StarterProject.git
 git clone ((YOUR GITHUB REPO))
 ```
 
-Follow directions here: https://help.github.com/articles/duplicating-a-repository/
+More detailed directions available here: https://help.github.com/articles/duplicating-a-repository/
 
 OR
 
