@@ -23,7 +23,9 @@ git clone ((YOUR GITHUB REPO))
 
 For more detailed directions: https://help.github.com/articles/duplicating-a-repository/
 
+
 OR
+
 
 Download and delete .git folder (to add a remote repository at a later date):
 ```
