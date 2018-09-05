@@ -7,6 +7,9 @@
   "compilerOptions": {
     "outDir": "dist",
     "baseUrl": "src",
+    "paths": {
+      "@util": [ "util/index" ]
+    },
     "sourceMap": false,
     "noImplicitAny": false,
     "declaration": false,

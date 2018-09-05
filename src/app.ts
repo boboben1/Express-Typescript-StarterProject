@@ -12,7 +12,7 @@ import * as express from 'express';
 import {cookieParser, bodyParser, expressValidator} from './express.middleware';
 
 
-import {Partial, Nullable, normalizePort} from './util';
+import {Partial, Nullable, normalizePort} from '@util';
 
 import * as Routes from './routes';
 
