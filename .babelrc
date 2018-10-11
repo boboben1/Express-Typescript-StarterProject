@@ -5,8 +5,8 @@
                 "node": true
             },
             "useBuiltIns": "entry",
-            "modules": false,
             "debug": true
-        }]
+        }],
+        "@babel/preset-typescript"
     ]
 }
