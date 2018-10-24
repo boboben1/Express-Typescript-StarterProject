@@ -4,20 +4,23 @@
     "dist",
     "node_modules",
   ],
+  "include": [
+    "src/**/*"
+  ],
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "build",
     "baseUrl": "src",
-    "paths": {
-      "@util": ["util/index"]
-    },
     "sourceMap": false,
     "noImplicitAny": false,
-    "declaration": false,
+    "declaration": true,
     "moduleResolution": "node",
     "downlevelIteration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@util": ["util/index"],
+    },
     "module": "commonjs",
     "target": "es2018",
     "importHelpers": true,

@@ -8,16 +8,142 @@ var sourcemaps = require('gulp-sourcemaps');
 var merge = require('merge-stream');
 var plumber = require('gulp-plumber');
 
-gulp.task('default', function () {
-	var tsResult = tsProject.src()
-		.pipe(plumber())
-		.pipe(sourcemaps.init())
-		.pipe(tsProject());
-	var babelResult = tsResult.js
-		.pipe(plumber())
-		.pipe(babel({}))
-		.pipe(sourcemaps.write('./'));
-	return merge(tsResult.dts, babelResult)
-		.pipe(plumber())
-		.pipe(gulp.dest('./dist'));
+var spawn = require('child_process').spawn;
+
+const parcelBuild = (file, target) =>
+    new Promise((resolve, reject) => {
+        const parcel = spawn(
+            'parcel',
+            ['build', file, '--target', target || 'browser'],
+            {
+                shell: true,
+            }
+        );
+
+        parcel.stderr.pipe(process.stderr);
+        parcel.stdout.pipe(process.stdout);
+
+        parcel.once('exit', number => {
+            if (number == 0) {
+                return resolve();
+            }
+            return reject(number);
+        });
+    });
+
+const doc = () =>
+    new Promise((resolve, reject) => {
+        const parcel = spawn('typedoc', ['--out', './doc'], {
+            shell: true,
+        });
+
+        parcel.stderr.pipe(process.stderr);
+        parcel.stdout.pipe(process.stdout);
+
+        parcel.once('exit', number => {
+            if (number == 0) {
+                return resolve();
+            }
+            return reject(number);
+        });
+    });
+
+gulp.task('doc', function(done) {
+    return doc().then(_ => done());
 });
+
+const compile = babelOpts => {
+    var tsResult = tsProject
+        .src()
+        .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(tsProject());
+    var babelResult = tsResult.js
+        .pipe(gulp.dest(`./${tsProject.config.compilerOptions.outDir}`))
+        .pipe(plumber())
+        .pipe(babel(babelOpts))
+        .pipe(sourcemaps.write('./'));
+    // @ts-ignore
+    return merge(tsResult.dts, babelResult)
+        .pipe(plumber())
+        .pipe(gulp.dest(`./${tsProject.config.compilerOptions.outDir}`));
+};
+
+const fixPaths = paths => {
+    let newPaths = {};
+    for (const key in paths) {
+        newPaths[key] = `./${tsProject.config.compilerOptions.outDir}/${
+            paths[key][0]
+        }`.replace('/*', '');
+    }
+    console.log(newPaths);
+    return newPaths;
+};
+
+gulp.task('parcel-library', function(done) {
+    parcelBuild('build/index.js', 'node').then(_ => done());
+});
+
+gulp.task('parcel-app', function(done) {
+    parcelBuild('build/index.js', 'node').then(_ => done());
+});
+
+gulp.task('build-app', function() {
+    return compile({
+        presets: [
+            [
+                '@babel/preset-env',
+                {
+                    targets: {
+                        node: true,
+                    },
+                    useBuiltIns: 'entry',
+                    debug: true,
+                },
+            ],
+            '@babel/preset-typescript',
+        ],
+        plugins: [
+            [
+                'babel-plugin-module-resolver',
+                {
+                    root: [`./${tsProject.config.compilerOptions.outDir}`],
+                    alias: fixPaths(tsProject.config.compilerOptions.paths),
+                },
+            ],
+        ],
+    });
+});
+
+gulp.task('build-library', function() {
+    return compile({
+        presets: [
+            [
+                '@babel/preset-env',
+                {
+                    targets: {
+                        node: true,
+                    },
+                    useBuiltIns: false,
+                    debug: true,
+                },
+            ],
+            '@babel/preset-typescript',
+        ],
+        plugins: [
+            [
+                'babel-plugin-module-resolver',
+                {
+                    root: [`./${tsProject.config.compilerOptions.outDir}`],
+                    alias: fixPaths(tsProject.config.compilerOptions.paths),
+                },
+            ],
+            '@babel/plugin-transform-runtime',
+            '@babel/plugin-transform-regenerator',
+        ],
+    });
+});
+
+gulp.task('library', gulp.series('build-library', 'parcel-library'));
+gulp.task('app', gulp.series('build-app', 'parcel-app'));
+gulp.task('default', gulp.series('library'));
